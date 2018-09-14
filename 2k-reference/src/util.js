@@ -1,6 +1,6 @@
 const gamePayLoad = () => (
   {
-    'url': 'scrapeURL',
+    'url': '',
     'team0': {
       'teamName': '',
       'q1': '',

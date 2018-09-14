@@ -1,17 +1,17 @@
 import 'babel-polyfill'
+import fs from 'fs'
+import mkdirp from 'mkdirp'
 import axios from 'axios'
 import cheerio from 'cheerio'
 import Promise from 'bluebird'
 import { gamePayLoad, playerPayLoad } from './util'
 
-/**
- * @return {array} - an array of game stats
- */
 const controller = async () => {
   const container = []
   const matchUrls = await scrapeGameURLs('https://2kleague.nba.com/schedule/')
   await Promise.map(matchUrls, async (gameUrl) => { await scrapeGameStats(gameUrl, container) })
-  return container
+  saveGameMatch(container, ['url', 'teamName', 'q1', 'q2', 'q3', 'q4', 'finalScore', 'name',
+    'fgm', '3pm', 'ftm', 'reb', 'ast', 'pf', 'stl', 'tov', 'blk', 'pts'])
 }
 
 /**
@@ -41,6 +41,7 @@ const scrapeGameURLs = async (scrapeURL) => {
 const scrapeGameStats = async (scrapeURL, container) => {
   const match = gamePayLoad()
   await axios.get(scrapeURL).then(async (response) => {
+    match['url'] = scrapeURL
     let $ = cheerio.load(response.data)
     const team0Players = await scrapePlayerGameStats(response.data, '.table.home-players')
     const team1Players = await scrapePlayerGameStats(response.data, '.table.away-players')
@@ -86,6 +87,44 @@ const scrapePlayerGameStats = async (htmlElement, table) => {
     }
   })
   return players
+}
+
+/**
+ * save game summaries of the conferation as a csv locally
+ */
+const saveGameMatch = async (match, header) => {
+  if (!fs.existsSync('result')) {
+    await mkdirp('result', (err) => {
+      if (err) console.error(err)
+      else console.log('Create path')
+    })
+  }
+
+  let csv = []
+  match.forEach(element => {
+    const baseTeam0 = `${element['url']}, ${element['team0']['teamName']}, ${element['team0']['q1']}, ${element['team0']['q2']}, ${element['team0']['q3']}, ${element['team0']['q4']}, ${element['team0']['finalScore']},`
+
+    element['team0']['players'].forEach(elem => {
+      const player = Object.keys(elem).map(fieldName => JSON.stringify(elem[fieldName])).join(',')
+      csv.push(`${baseTeam0}${player}`)
+    })
+
+    const baseTeam1 = `${element['url']}, ${element['team1']['teamName']}, ${element['team1']['q1']}, ${element['team1']['q2']}, ${element['team1']['q3']}, ${element['team1']['q4']}, ${element['team1']['finalScore']},`
+
+    element['team1']['players'].forEach(elem => {
+      const player = Object.keys(elem).map(fieldName => JSON.stringify(elem[fieldName])).join(',')
+      csv.push(`${baseTeam1}${player}`)
+    })
+  })
+
+  csv.join(',')
+  csv.unshift(header.join(','))
+  csv = csv.join('\r\n')
+
+  await fs.writeFile(`result/match.csv`, csv, 'utf8', (err) => {
+    if (err) throw err
+    console.log(`The file has been saved!`)
+  })
 }
 
 controller()
