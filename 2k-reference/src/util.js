@@ -25,9 +25,15 @@ const gamePayLoad = () => (
 const playerPayLoad = () => (
   {
     'name': '',
+    'fgmRatio': '',
     'fgm': '',
+    'fgmPercent': '',
+    '3pmRatio': '',
     '3pm': '',
+    '3pmPercent': '',
+    'ftmRatio': '',
     'ftm': '',
+    'ftmPercent': '',
     'reb': '',
     'ast': '',
     'pf': '',

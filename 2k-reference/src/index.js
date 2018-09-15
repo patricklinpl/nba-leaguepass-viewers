@@ -45,12 +45,12 @@ const scrapeGameStats = async (scrapeURL, container) => {
     let $ = cheerio.load(response.data)
     const team0Players = await scrapePlayerGameStats(response.data, '.table.home-players')
     const team1Players = await scrapePlayerGameStats(response.data, '.table.away-players')
+    match['date'] = $('.game-header__date').text()
     match['team0']['players'] = team0Players
     match['team1']['players'] = team1Players
     $('.name').each((i, elem) => {
       const boxScoreElement = $(elem).parent()
       match[`team${i}`]['teamName'] = boxScoreElement.find('.name').text().trim()
-
       boxScoreElement.find('.quarter.q1').each((x, element) => {
         match[`team${i}`][`q${x + 1}`] = $(element).text().trim()
       })
@@ -70,19 +70,38 @@ const scrapePlayerGameStats = async (htmlElement, table) => {
   const players = []
   let $ = cheerio.load(htmlElement)
   $(table).find('tr').each((i, elem) => {
-    const store = playerPayLoad()
-    store['name'] = $(elem).find('td[data-type="ln"]').text()
-    store['fgm'] = $(elem).find('td[data-type="fgm"]').text()
-    store['3pm'] = $(elem).find('td[data-type="fg3m"]').text()
-    store['ftm'] = $(elem).find('td[data-type="ftm"]').text()
-    store['reb'] = $(elem).find('td[data-type="reb"]').text()
-    store['ast'] = $(elem).find('td[data-type="ast"]').text()
-    store['pf'] = $(elem).find('td[data-type="pf"]').text()
-    store['stl'] = $(elem).find('td[data-type="stl"]').text()
-    store['tov'] = $(elem).find('td[data-type="tov"]').text()
-    store['blk'] = $(elem).find('td[data-type="blk"]').text()
-    store['pts'] = $(elem).find('td[data-type="pts"]').text()
-    if (store['pts'] !== '') {
+    if ($(elem).find('td[data-type="pts"]').text() !== '') {
+      const store = playerPayLoad()
+      store['name'] = $(elem).find('td[data-type="ln"]').text()
+      store['fgmRatio'] = $(elem).find('td[data-type="fgm"]').text()
+      const splitfg = store['fgmRatio'].split('-')
+      store['fgm'] = splitfg[0]
+      store['fgmPercent'] = parseInt(splitfg[0]) / parseInt(splitfg[1])
+      if (store['fgmRatio'] === '0-0') {
+        store['fgmPercent'] = 0
+      }
+      store['3pmRatio'] = $(elem).find('td[data-type="fg3m"]').text()
+      const split3pm = store['3pmRatio'].split('-')
+      store['3pm'] = split3pm[0]
+      store['3pmPercent'] = parseInt(split3pm[0]) / parseInt(split3pm[1])
+      if (store['3pmRatio'] === '0-0') {
+        store['3pmPercent'] = 0
+      }
+      store['ftmRatio'] = $(elem).find('td[data-type="ftm"]').text()
+      const splitftm = store['ftmRatio'].split('-')
+      store['ftm'] = splitftm[0]
+      store['ftmPercent'] = parseInt(splitftm[0]) / parseInt(splitftm[1])
+      if (store['ftmRatio'] === '0-0') {
+        store['ftmPercent'] = 0
+      }
+      store['reb'] = $(elem).find('td[data-type="reb"]').text()
+      store['ast'] = $(elem).find('td[data-type="ast"]').text()
+      store['pf'] = $(elem).find('td[data-type="pf"]').text()
+      store['stl'] = $(elem).find('td[data-type="stl"]').text()
+      store['tov'] = $(elem).find('td[data-type="tov"]').text()
+      store['blk'] = $(elem).find('td[data-type="blk"]').text()
+      store['pts'] = $(elem).find('td[data-type="pts"]').text()
+      console.log(store)
       players.push(store)
     }
   })
@@ -102,14 +121,14 @@ const saveGameMatch = async (match, header) => {
 
   let csv = []
   match.forEach(element => {
-    const baseTeam0 = `${element['url']}, ${element['team0']['teamName']}, ${element['team0']['q1']}, ${element['team0']['q2']}, ${element['team0']['q3']}, ${element['team0']['q4']}, ${element['team0']['finalScore']},`
+    const baseTeam0 = `${element['url']}, ${element['date']}, ${element['team0']['teamName']}, ${element['team0']['q1']}, ${element['team0']['q2']}, ${element['team0']['q3']}, ${element['team0']['q4']}, ${element['team0']['finalScore']},`
 
     element['team0']['players'].forEach(elem => {
       const player = Object.keys(elem).map(fieldName => JSON.stringify(elem[fieldName])).join(',')
       csv.push(`${baseTeam0}${player}`)
     })
 
-    const baseTeam1 = `${element['url']}, ${element['team1']['teamName']}, ${element['team1']['q1']}, ${element['team1']['q2']}, ${element['team1']['q3']}, ${element['team1']['q4']}, ${element['team1']['finalScore']},`
+    const baseTeam1 = `${element['url']}, ${element['date']}, ${element['team1']['teamName']}, ${element['team1']['q1']}, ${element['team1']['q2']}, ${element['team1']['q3']}, ${element['team1']['q4']}, ${element['team1']['finalScore']},`
 
     element['team1']['players'].forEach(elem => {
       const player = Object.keys(elem).map(fieldName => JSON.stringify(elem[fieldName])).join(',')
