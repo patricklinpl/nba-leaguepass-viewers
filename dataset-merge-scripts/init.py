@@ -44,15 +44,20 @@ def merge_secondary_trans():
     merged_df = pd.merge(base_CSV, secondary_trans, how='outer', on=['Date', 'Home', 'Away', 'Season'])
     merged_df.to_csv('../dataset/merge-data/att-dma-nat-rsn-sectrans.csv', index=False)
 
-
+def merge_velocity():
+    base_CSV = pd.read_csv('../dataset/merge-data/att-dma-nat-rsn-sectrans.csv')
+    velocity = pd.read_csv('../dataset/provided-data/Velocity_of_Individual_Ticket_Sales.csv') 
+    merged_df = pd.merge(base_CSV, velocity, how='outer', on=['Season', 'Home', 'Away', 'Date'])
+    merged_df.to_csv('../dataset/merge-data/att-dma-nat-rsn-sectrans-velocity.csv', index=False)
 
 def merge_data_set():
     """This function matches and merges CSV to make one data set"""
-    # merge_attendance()
-    # merge_dma()
-    # merge_national_ratings()
-    # merge_rsn_rating()
+    merge_attendance()
+    merge_dma()
+    merge_national_ratings()
+    merge_rsn_rating()
     merge_secondary_trans()
+    merge_velocity()
 
 
 merge_data_set()
