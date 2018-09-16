@@ -11,11 +11,24 @@ def merge_attendance():
     #     attendance.at[i, 'Date'] = datetime.datetime.strptime(row['Date'], '%m/%d/%Y').date()
     # attendance.to_csv('../dataset/provided-data/Attendance_Capacity_Primary_Tickets.csv', index=False)
     merged_df = pd.merge(base_CSV, attendance, how='outer', on=['Date', 'Home', 'Away'])
-    merged_df.to_csv('../dataset/merge-data/attendance-merge.csv', index=False)
+    merged_df.to_csv('../dataset/merge-data/att.csv', index=False)
+
+def merge_dma():
+    base_CSV = pd.read_csv('../dataset/merge-data/att.csv')
+    dma = pd.read_csv('../dataset/provided-data/DMA_Households.csv')
+    base_CSV['dma_home'] = ""
+    base_CSV['dma_away'] = ""
+    for i, row in base_CSV.iterrows():
+        base_CSV.at[i,'dma_home'] = dma.loc[dma['Team'] == row['Home']]['DMA_TV_Households_Millions'].item()
+        base_CSV.at[i,'dma_away'] = dma.loc[dma['Team'] == row['Away']]['DMA_TV_Households_Millions'].item()
+    base_CSV.to_csv('../dataset/merge-data/dma-att.csv', index=False) 
+        
+
 
 def merge_data_set():
     """This function matches and merges CSV to make one data set"""
     merge_attendance()
+    merge_dma()
 
 
 merge_data_set()
