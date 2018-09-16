@@ -28,14 +28,31 @@ def merge_national_ratings():
     nat_rating = pd.read_csv('../dataset/provided-data/National_Ratings_by_Game.csv') 
     # for i, row in nat_rating.iterrows():
     #     nat_rating.at[i, 'Date'] = datetime.datetime.strptime(row['Date'], '%m/%d/%Y').date()
+    # attendance.to_csv('../dataset/provided-data/National_Ratings_by_Game.csv', index=False)
     merged_df = pd.merge(base_CSV, nat_rating, how='outer', on=['Date', 'Home', 'Away', 'Season'])
     merged_df.to_csv('../dataset/merge-data/att-dma-nat.csv', index=False)
+
+def merge_rsn_rating():
+    base_CSV = pd.read_csv('../dataset/merge-data/att-dma-nat.csv')
+    rsn_rating = pd.read_csv('../dataset/provided-data/RSN_Ratings_by_Game.csv') 
+    merged_df = pd.merge(base_CSV, rsn_rating, how='outer', on=['Date', 'Home', 'Away', 'Season'])
+    merged_df.to_csv('../dataset/merge-data/att-dma-nat-rsn.csv', index=False)
+
+def merge_secondary_trans():
+    base_CSV = pd.read_csv('../dataset/merge-data/att-dma-nat-rsn.csv')
+    secondary_trans = pd.read_csv('../dataset/provided-data/Secondary_Transactions_by_Game.csv') 
+    merged_df = pd.merge(base_CSV, secondary_trans, how='outer', on=['Date', 'Home', 'Away', 'Season'])
+    merged_df.to_csv('../dataset/merge-data/att-dma-nat-rsn-sectrans.csv', index=False)
+
+
 
 def merge_data_set():
     """This function matches and merges CSV to make one data set"""
     # merge_attendance()
     # merge_dma()
-    merge_national_ratings()
+    # merge_national_ratings()
+    # merge_rsn_rating()
+    merge_secondary_trans()
 
 
 merge_data_set()
