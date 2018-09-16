@@ -1,4 +1,4 @@
-# Poeltls-2K-Viz
+# Poeltls-leaguepass-rank
 
 ## Data Sources and Types
 * Twitch Data
