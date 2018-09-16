@@ -1,4 +1,4 @@
-# Poeltls-leaguepass-rank
+# NinjaPoeltls-leaguepass-viewers
 
 ## Data Sources and Types
 * Twitch Data
