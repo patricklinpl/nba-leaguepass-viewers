@@ -29,5 +29,4 @@ lpv_d2 = pd.concat([lpv_d.assign(Team = lpv_d['Home'], Opp = lpv_d['Away']),
 lpv_d2['At_Home'] = (lpv_d2.Team == lpv_d2.Home)
 
 lpv_d.to_csv('../dataset/lpv_d.csv')
-lpv_d2.to_csv../dataset/lpv_d2.csv')
-
+lpv_d2.to_csv('../dataset/lpv_d2.csv')
