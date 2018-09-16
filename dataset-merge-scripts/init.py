@@ -21,14 +21,15 @@ def merge_dma():
     for i, row in base_CSV.iterrows():
         base_CSV.at[i,'dma_home'] = dma.loc[dma['Team'] == row['Home']]['DMA_TV_Households_Millions'].item()
         base_CSV.at[i,'dma_away'] = dma.loc[dma['Team'] == row['Away']]['DMA_TV_Households_Millions'].item()
-    base_CSV.to_csv('../dataset/merge-data/dma-att.csv', index=False) 
+    base_CSV.to_csv('../dataset/merge-data/att-dma.csv', index=False) 
         
 
 
 def merge_data_set():
     """This function matches and merges CSV to make one data set"""
-    merge_attendance()
+    # merge_attendance()
     merge_dma()
+    # merge_national_ratings()
 
 
 merge_data_set()
