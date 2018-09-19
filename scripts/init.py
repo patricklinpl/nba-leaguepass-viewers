@@ -14,7 +14,11 @@ def changeDate():
 def merge_attendance():
     base_CSV = pd.read_csv('../dataset/lpv_d.csv')
     attendance = pd.read_csv('../dataset/provided-data/Attendance_Capacity_Primary_Tickets.csv')
-    return pd.merge(base_CSV, attendance, how='left', on=['Date', 'Home', 'Away'])
+    merged_df = pd.merge(base_CSV, attendance, how='left', on=['Date', 'Home', 'Away'])
+    for i, row in merged_df.iterrows():
+        merged_df.at[i, 'Season'] = '2017-18'
+        
+    return merged_df
 
 def merge_dma(df):
     dma = pd.read_csv('../dataset/provided-data/DMA_Households.csv')
