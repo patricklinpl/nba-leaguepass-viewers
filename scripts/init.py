@@ -17,7 +17,6 @@ def merge_attendance():
     merged_df = pd.merge(base_CSV, attendance, how='left', on=['Date', 'Home', 'Away'])
     for i, row in merged_df.iterrows():
         merged_df.at[i, 'Season'] = '2017-18'
-        
     return merged_df
 
 def merge_dma(df):
